@@ -75,9 +75,25 @@ GitHub's own contribution graph can't be restyled: visitors see it in their own 
 - Days are ranked among the days with work. GitHub's graph uses quartiles; this uses all twelve steps, so the year shows its texture.
 - The sheet is a calligraphy practice grid with faint vermilion rules.
 - The rows are the days of the week in kanji: 日 sun, 月 moon, 火 fire, 水 water, 木 wood, 金 metal, 土 earth.
-- Under each character the ink has soaked into the paper, darker for a busier day, so the year still reads at a glance like GitHub's own graph. A key in the corner runs from less to more.
-- The busiest day is written in vermilion. Today's square waits, ringed, like the next key of the evening's phrase.
+- Each season writes in its own ink, from named traditional colours:
+
+  | Season | Ink | Edged with |
+  | --- | --- | --- |
+  | Winter | 紅梅 plum | 桜 cherry |
+  | Spring | 萌黄 new green | (lighter 萌黄) |
+  | Summer | 藍 indigo | 群青 ultramarine |
+  | Autumn | 鬱金 turmeric | 山吹 golden yellow |
+
+  Values come from nipponcolors.com and 和色大辞典, which often disagree; the code names which one it uses. Reds are avoided so the vermilion stays unmistakable.
+- Under each character the ink soaks into the paper as a nioi gradient (匂, a Heian term for one colour stepped from dark to light). The pooled colour sits in the middle and its lighter companion at the edge.
+- Lightness says how much. Every ink shares the same five steps, so a busy day is as heavy in summer as in winter, and the key in the corner runs from less to more. The colours are muted to watercolour strength: watered-down days are nearly grey, and colour comes where the ink pools.
+- Hue only says when, which the month names already say. We checked the inks with a colour validator (OKLab, with simulated colour blindness). The steps darken evenly, and neighbouring seasons stay apart for full colour vision. For readers who see colour differently, the months are labelled and placed.
+- The busiest day is written in vermilion.
+- Each month's best day, when it beats a usual day (the median of days with work), gets the teacher's double circle in shuzumi, the vermilion ink calligraphy teachers correct with.
+- Today's square waits, ringed, like the next key of the evening's phrase.
 - The year writes itself in a week at a time on sixteenth notes, holds, and starts again.
+
+Sources for the inks: [nipponcolors.com](https://nipponcolors.com/), [和色大辞典](https://www.colordic.org/w), [kasane no irome](http://www.kariginu.jp/kikata/kasane-irome.htm), and on shuzumi corrections [Kotobank](https://kotobank.jp/word/%E6%9C%B1-76659).
 
 `.github/workflows/bath.yml` draws the bath and the year from one request at 06:10 Singapore time, when OkiPaca's alarm goes off. It also runs whenever the drawing code changes, and by hand from the Actions tab. If you show private contributions on your profile, they count too.
 
