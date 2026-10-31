@@ -15,7 +15,9 @@ bath starts again.
 The rings are exact, not simulated: every point is moved by the closed-form
 drop and tine transforms from Lu, Jaffer, Jin, Zhao and Mao, "Mathematical
 Marbling" (IEEE CG&A, 2012), as in the site's components/day/marbling.ts.
-Needs only the standard library and numpy, so it runs in a GitHub Action.
+The same calendar, a whole year of it, is also written out as characters in
+ink/year.svg (tools/year.py). Needs only the standard library and numpy, so
+it runs in a GitHub Action.
 """
 from __future__ import annotations
 
@@ -31,8 +33,11 @@ import urllib.request
 
 import numpy as np
 
+import year
+
 HERE = pathlib.Path(__file__).resolve().parent
 OUT = HERE.parent / 'ink' / 'bath.svg'
+YEAR = HERE.parent / 'ink' / 'year.svg'
 FONTS = HERE / 'fonts'
 
 W, H = 1200, 580
@@ -60,16 +65,15 @@ def fetch(login: str, token: str) -> list[tuple[str, int]]:
     if 'errors' in data:
         raise SystemExit(f'GitHub said: {data["errors"]}')
     weeks = data['data']['user']['contributionsCollection']['contributionCalendar']['weeks']
-    days = [(d['date'], d['contributionCount']) for w in weeks for d in w['contributionDays']]
-    return days[-DAYS:]
+    return [(d['date'], d['contributionCount']) for w in weeks for d in w['contributionDays']]
 
 
-def sample() -> list[tuple[str, int]]:
-    """A plausible month for trying the drawing without a token."""
+def sample(length: int = 366) -> list[tuple[str, int]]:
+    """A plausible year for trying the drawings without a token."""
     end = dt.date(2026, 10, 30)
     out = []
-    for k in range(DAYS):
-        day = end - dt.timedelta(days=DAYS - 1 - k)
+    for k in range(length):
+        day = end - dt.timedelta(days=length - 1 - k)
         h = int(hashlib.sha1(day.isoformat().encode()).hexdigest(), 16)
         n = 0 if h % 9 == 0 else (h >> 8) % 24 + (8 if day.weekday() < 5 else 0)
         out.append((day.isoformat(), n))
@@ -180,6 +184,12 @@ def font_face(family: str, weight: int, file: str) -> str:
     return f'@font-face{{font-family:{family};font-weight:{weight};src:url(data:font/woff2;base64,{b}) format("woff2")}}'
 
 
+def fonts() -> str:
+    """The subsets tools/build.py writes for the daily drawings."""
+    return (font_face('Shippori', 800, 'mincho-800.woff2') + font_face('Shippori', 500, 'mincho-500.woff2')
+            + font_face('InterTight', 600, 'sans-600.woff2'))
+
+
 def esc(s: str) -> str:
     return s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
@@ -239,8 +249,7 @@ def render(days: list[tuple[str, int]]) -> str:
     grain = ('<filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" '
              'baseFrequency="0.85 0.3" numOctaves="3" seed="5"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  '
              '0 0 0 0 1  0 0 0 0.9 -0.42"/></filter>')
-    css = (font_face('Shippori', 800, 'bath-mincho-800.woff2') + font_face('Shippori', 500, 'bath-mincho-500.woff2')
-           + font_face('InterTight', 600, 'bath-sans-600.woff2')
+    css = (fonts()
            + '.still{display:none}@media (prefers-reduced-motion:reduce){.live{display:none}.still{display:inline}}')
     title = 'Suminagashi: four weeks of contributions as floating ink'
     desc = (f'Each day from {first:%d %B} to {last:%d %B %Y} falls into a bath of water as a drop of ink, '
@@ -263,8 +272,7 @@ def render(days: list[tuple[str, int]]) -> str:
 
 def still_water() -> str:
     """The bath before its first morning: no drops, and no numbers to stand in for real ones."""
-    css = font_face('Shippori', 800, 'bath-mincho-800.woff2') + font_face('Shippori', 500, 'bath-mincho-500.woff2') \
-        + font_face('InterTight', 600, 'bath-sans-600.woff2')
+    css = fonts()
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img" aria-labelledby="t">'
         f'<title id="t">Suminagashi: still water until the first morning run</title><style>{css}</style>'
@@ -285,10 +293,13 @@ def main():
     args = ap.parse_args()
     if args.still:
         OUT.write_text(still_water(), encoding='utf-8')
-        print('ink/bath.svg  still water')
+        today = dt.date.today()
+        blank = [((today - dt.timedelta(days=365 - k)).isoformat(), 0) for k in range(366)]
+        YEAR.write_text(year.render(blank, fonts(), waiting=True), encoding='utf-8')
+        print('ink/bath.svg, ink/year.svg  still water, still paper')
         return
     if args.data:
-        days = [tuple(d) for d in json.loads(args.data.read_text())][-DAYS:]
+        days = [tuple(d) for d in json.loads(args.data.read_text())]
     elif args.sample:
         days = sample()
     else:
@@ -296,9 +307,12 @@ def main():
         if not token:
             raise SystemExit('Set GITHUB_TOKEN, or pass --sample.')
         days = fetch(args.login, token)
-    svg = render(days)
+    svg = render(days[-DAYS:])
     OUT.write_text(svg, encoding='utf-8')
-    print(f'ink/bath.svg  {len(svg.encode()) / 1024:.0f} KB  ({days[0][0]} to {days[-1][0]})')
+    print(f'ink/bath.svg  {len(svg.encode()) / 1024:.0f} KB  ({days[-DAYS][0]} to {days[-1][0]})')
+    svg = year.render(days, fonts())
+    YEAR.write_text(svg, encoding='utf-8')
+    print(f'ink/year.svg  {len(svg.encode()) / 1024:.0f} KB  ({days[0][0]} to {days[-1][0]})')
 
 
 if __name__ == '__main__':
