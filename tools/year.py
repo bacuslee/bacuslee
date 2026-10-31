@@ -5,7 +5,10 @@ The contribution calendar, written the way the site's opening draws Latte
 ranked by how much ink it puts down, so a busier day is a heavier character.
 The grid is a calligraphy practice sheet with faint vermilion rules, the rows
 are the days of the week in kanji (日 sun, 月 moon, 火 fire, 水 water, 木 wood,
-金 metal, 土 earth) and the months are written in numerals. The busiest day is
+金 metal, 土 earth) and the months are written in numerals. Under each character
+the ink has soaked into the paper, darker for a busier day, so the year still
+reads at a glance like GitHub's own graph, and a key in the corner shows the
+scale from less to more. The busiest day is
 the one character in vermilion; today's square waits, ringed, like the next
 key of the evening's phrase. The year writes itself in, a week on every
 sixteenth note at 90 BPM, holds, and writes itself again.
@@ -64,6 +67,11 @@ def runs(days: list[tuple[str, int]]) -> tuple[int, int]:
     return longest, current
 
 
+def doc_width(label: str) -> float:
+    """Rough width of a 13px tracked Inter Tight label, for placing the key beside it."""
+    return len(label) * 10.6
+
+
 def pct(t: float, cycle: float) -> str:
     return f'{max(0.0, min(100.0, 100 * t / cycle)):.3f}%'
 
@@ -76,7 +84,6 @@ def render(days: list[tuple[str, int]], css_fonts: str, waiting: bool = False) -
     cols = (dt.date.fromisoformat(days[-1][0]) - start).days // 7 + 1
     x0, y0, right = 112, 150, 64
     cell = (W - x0 - right) / cols
-    fs = cell * 0.84
     active = sorted(n for _, n in days if n > 0)
     busiest = max(range(len(days)), key=lambda i: days[i][1])
 
@@ -89,34 +96,58 @@ def render(days: list[tuple[str, int]], css_fonts: str, waiting: bool = False) -
         lv = 0 if waiting else level(n, active)
         if not lv:
             continue
-        gx = x0 + c * cell + (cell - fs) / 2
-        gy = y0 + r * cell + cell / 2 + fs * 0.36
+        cx, cy = x0 + c * cell, y0 + r * cell
+        mark = (cx, cy, lv)
         if i == busiest:
-            shu = (gx, gy, RAMP[lv - 1], c)
+            shu = (mark, c)
         else:
-            weeks.setdefault(c, []).append((gx, gy, RAMP[lv - 1]))
+            weeks.setdefault(c, []).append(mark)
 
     step = BEAT / 4
     cycle = BEAT * 36
     fade = cycle - BEAT
     css, body = [], []
 
-    def column(cells, c, fill):
+    def column(marks, c, fill):
         cls = f'w{c}' if fill == SUMI else 'ws'
         t = BEAT + c * step
         css.append(f'@keyframes {cls}{{0%,{pct(t, cycle)}{{opacity:0}}{pct(t + 0.001, cycle)}{{opacity:.4}}'
                    f'{pct(t + 1 / 12, cycle)},{pct(fade, cycle)}{{opacity:1}}{pct(fade + BEAT * 0.75, cycle)},100%{{opacity:0}}}}'
                    f'.{cls}{{animation:{cls} {cycle:.3f}s step-end infinite}}')
-        s = ''.join(ch for _, _, ch in cells)
-        xs = ' '.join(f'{x:.1f}' for x, _, _ in cells)
-        ys = ' '.join(f'{y:.1f}' for _, y, _ in cells)
-        return (f'<text class="{cls}" x="{xs}" y="{ys}" font-family="Shippori,serif" font-weight="800" '
-                f'font-size="{fs:.2f}" fill="{fill}">{s}</text>')
+        return f'<g class="{cls}">{"".join(wash(*m, fill) for m in marks)}{glyphs(marks, fill)}</g>'
+
+    def glyphs(marks, fill, size=None):
+        size = size or cell
+        f = size * 0.84
+        s = ''.join(RAMP[lv - 1] for _, _, lv in marks)
+        xs = ' '.join(f'{x + (size - f) / 2:.1f}' for x, _, _ in marks)
+        ys = ' '.join(f'{y + size / 2 + f * 0.36:.1f}' for _, y, _ in marks)
+        return (f'<text x="{xs}" y="{ys}" font-family="Shippori,serif" font-weight="800" '
+                f'font-size="{f:.2f}" fill="{fill}">{s}</text>')
+
+    def wash(x, y, lv, fill, size=None):
+        # ink soaked into the paper under the character: a soft square, darker for more
+        size = size or cell
+        g = 'washshu' if fill == SHU else 'wash'
+        return (f'<rect x="{x + 1.5:.1f}" y="{y + 1.5:.1f}" width="{size - 3:.1f}" height="{size - 3:.1f}" '
+                f'rx="{size * 0.22:.1f}" fill="url(#{g})" fill-opacity="{0.05 + 0.3 * (lv / len(RAMP)) ** 1.3:.3f}"/>')
 
     for c in sorted(weeks):
         body.append(column(weeks[c], c, SUMI))
     if shu:
-        body.append(column([shu[:3]], shu[3], SHU))
+        body.append(column([shu[0]], shu[1], SHU))
+
+    # the key: less to more, as on GitHub's graph
+    k = cell * 0.92
+    key_lv = [1, 3, 5, 7, 9, 11, 12]
+    kx = W - right - doc_width('MORE') - 10 - len(key_lv) * (k + 3)
+    ky = H - 34 - k * 0.72
+    key = [f'<text x="{kx - 10:.1f}" y="{H - 34}" text-anchor="end" font-family="InterTight,sans-serif" font-weight="600" '
+           f'font-size="13" letter-spacing="1.8" fill="{SUMI}" opacity="0.66">LESS</text>']
+    marks = [(kx + j * (k + 3), ky, lv) for j, lv in enumerate(key_lv)]
+    key += [wash(*m, SUMI, size=k) for m in marks] + [glyphs(marks, SUMI, size=k)]
+    key.append(f'<text x="{W - right}" y="{H - 34}" text-anchor="end" font-family="InterTight,sans-serif" font-weight="600" '
+               f'font-size="13" letter-spacing="1.8" fill="{SUMI}" opacity="0.66">MORE</text>')
 
     # the practice sheet's rules
     rules = [f'M{x0:.1f} {y0 + r * cell:.1f}H{x0 + cols * cell:.1f}' for r in range(8)]
@@ -156,7 +187,7 @@ def render(days: list[tuple[str, int]], css_fonts: str, waiting: bool = False) -
         stats = (f'{total:,} contributions in the last year · longest run {longest} days · '
                  f'current run {current} days · busiest {dt.date.fromisoformat(days[busiest][0]):%b %d} '
                  f'({days[busiest][1]}), in vermilion').upper()
-    css.append('@media (prefers-reduced-motion:reduce){text,.today{animation:none!important;opacity:1!important}}')
+    css.append('@media (prefers-reduced-motion:reduce){g,.today{animation:none!important;opacity:1!important}}')
     title = 'A year in characters'
     desc = ('Every day of the last year written as one character on a practice sheet; the more I committed, '
             f'the more ink the character takes. {stats.capitalize()}.')
@@ -167,8 +198,12 @@ def render(days: list[tuple[str, int]], css_fonts: str, waiting: bool = False) -
         f'<text x="64" y="64" font-family="Shippori,serif" font-weight="800" font-size="36" fill="{SUMI}">一年 · A year in characters</text>'
         f'<text x="64" y="98" font-family="Shippori,serif" font-weight="500" font-size="20" fill="{SUMI}" opacity="0.8">'
         f'Every day is one character; the more I committed, the more ink it takes.</text>'
-        f'{sheet}{"".join(labels)}{"".join(body)}{ring}'
+        f'<defs><radialGradient id="wash" r="0.7"><stop offset="0" stop-color="{SUMI}"/><stop offset="0.6" '
+        f'stop-color="{SUMI}" stop-opacity="0.85"/><stop offset="1" stop-color="{SUMI}" stop-opacity="0.35"/></radialGradient>'
+        f'<radialGradient id="washshu" r="0.7"><stop offset="0" stop-color="{SHU}"/><stop offset="0.6" stop-color="{SHU}" '
+        f'stop-opacity="0.85"/><stop offset="1" stop-color="{SHU}" stop-opacity="0.35"/></radialGradient></defs>'
+        f'{sheet}{"".join(labels)}{"".join(body)}{ring}{"".join(key)}'
         f'<text x="64" y="{H - 34}" font-family="InterTight,sans-serif" font-weight="600" font-size="13" letter-spacing="1.8" '
         f'fill="{SUMI}" opacity="0.66">{esc(stats)}</text>'
-        f'<text x="{W - 64}" y="{H - 34}" text-anchor="end" font-family="InterTight,sans-serif" font-weight="600" '
+        f'<text x="{W - 64}" y="64" text-anchor="end" font-family="InterTight,sans-serif" font-weight="600" '
         f'font-size="13" letter-spacing="1.8" fill="{SUMI}" opacity="0.66">REDRAWN EACH MORNING</text></svg>')
