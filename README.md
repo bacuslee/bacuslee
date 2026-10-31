@@ -12,7 +12,7 @@
 | --- | --- | --- |
 | An iPhone alarm that stops only when you prove you are up: scan a QR code or barcode, tap an NFC tag, find an object on camera, or count reps.<br><sub>SWIFTUI · ALARMKIT · VISIONKIT · CORE NFC · SWIFTDATA · ON-DEVICE OBJECT RECOGNITION · SCREEN TIME</sub> | An EPUB reader that feels like paper. Ask about the book and every answer cites its passages, only up to where you have read.<br><sub>SWIFTUI · READIUM · SPOILER-AWARE RETRIEVAL · SUPABASE: POSTGRES AND EDGE FUNCTIONS · APP ATTEST</sub> | Import MusicXML, a PDF or a photo of a score, play it on your piano, and it waits for the right note.<br><sub>FLUTTER · MIDI · MICROPHONE PITCH DETECTION · SHEET-MUSIC RECOGNITION · SUPABASE · PYTHON WORKERS</sub> |
 
-<img src="ink/year.svg" width="100%" alt="A year in characters: my contribution calendar for the last year written on a calligraphy practice sheet, one character per day, a heavier character for a busier day, the busiest in vermilion. Redrawn every morning.">
+<img src="ink/year.svg" width="100%" alt="A year in characters: my contribution calendar for the last year written on a calligraphy practice sheet, one character per day, each season in its own ink, a heavier character and a deeper wash for a busier day, the busiest in vermilion and each month's best day circled in red. Redrawn every morning.">
 
 <img src="ink/bath.svg" width="100%" alt="Suminagashi: the last four weeks of my contribution calendar dropped into a bath of water as ink, one day on every beat, a busier day a wider ring, then combed and printed. Redrawn every morning.">
 
