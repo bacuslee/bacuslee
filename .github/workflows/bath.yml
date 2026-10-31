@@ -1,13 +1,14 @@
 name: Floating ink
 
-# Redraws ink/bath.svg from the contribution calendar every morning at 06:10
-# in Singapore, when OkiPaca's alarm goes off, and whenever the drawing changes.
+# Redraws ink/bath.svg and ink/year.svg from the contribution calendar every
+# morning at 06:10 in Singapore, when OkiPaca's alarm goes off, and whenever
+# the drawing changes.
 on:
   schedule:
     - cron: '10 22 * * *'
   push:
     branches: [main, master]
-    paths: ['tools/bath.py', 'tools/fonts/**', '.github/workflows/bath.yml']
+    paths: ['tools/bath.py', 'tools/year.py', 'tools/fonts/**', '.github/workflows/bath.yml']
   workflow_dispatch:
 
 permissions:
@@ -26,15 +27,15 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install numpy
-      - name: Drop the last four weeks into the bath
+      - name: Drop the last four weeks into the bath and write out the year
         run: python3 tools/bath.py --login "${{ github.repository_owner }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Keep the print
         run: |
-          git diff --quiet -- ink/bath.svg && exit 0
+          git diff --quiet -- ink/bath.svg ink/year.svg && exit 0
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add ink/bath.svg
+          git add ink/bath.svg ink/year.svg
           git commit -m 'Take this morning’s print'
           git push

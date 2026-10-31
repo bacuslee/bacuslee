@@ -67,14 +67,25 @@ reduced motion see the opening, finished and still.
 
 Every point is moved by the closed-form drop and tine transforms from Lu, Jaffer et al., "Mathematical Marbling" (IEEE CG&A 2012). The method runs the month densely first, then keeps points spaced evenly along each ring's final shape. Each ring is a single SMIL path animation, and the busiest frame holds 60 fps.
 
-`.github/workflows/bath.yml` redraws it at 06:10 Singapore time, when OkiPaca's alarm goes off. It also runs whenever the drawing code changes, and by hand from the Actions tab. If you show private contributions on your profile, they count as drops too.
+## 4. The year
 
-## 4. Rebuilding
+GitHub's own contribution graph can't be restyled: visitors see it in their own theme. So the README draws its own. `ink/year.svg` is that graph written the way the opening draws Latte (`tools/year.py`):
+
+- Every day of the last year is one character from the moji-e ramp (一 二 へ 工 大 口 水 来 林 雨 猫 鬱). The ramp is ranked by how much ink each glyph puts down.
+- Days are ranked among the days with work. GitHub's graph uses quartiles; this uses all twelve steps, so the year shows its texture.
+- The sheet is a calligraphy practice grid with faint vermilion rules.
+- The rows are the days of the week in kanji: 日 sun, 月 moon, 火 fire, 水 water, 木 wood, 金 metal, 土 earth.
+- The busiest day is written in vermilion. Today's square waits, ringed, like the next key of the evening's phrase.
+- The year writes itself in a week at a time on sixteenth notes, holds, and starts again.
+
+`.github/workflows/bath.yml` draws the bath and the year from one request at 06:10 Singapore time, when OkiPaca's alarm goes off. It also runs whenever the drawing code changes, and by hand from the Actions tab. If you show private contributions on your profile, they count too.
+
+## 5. Rebuilding
 
 ```bash
 pip install fonttools brotli pillow numpy
-python3 tools/build.py --fonts path/to/fonts     # day, scrolls, bath fonts
-python3 tools/bath.py --sample                   # try the bath without a token
+python3 tools/build.py --fonts path/to/fonts     # day, scrolls, font subsets for the daily drawings
+python3 tools/bath.py --sample                   # try the bath and the year without a token
 GITHUB_TOKEN=... python3 tools/bath.py --login bacuslee
 ```
 

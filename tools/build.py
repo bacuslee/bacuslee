@@ -696,11 +696,12 @@ def main():
             n = hanging_scroll(fonts, s, order).save(OUT / f'scroll-{s["slug"]}.svg')
             print(f'ink/scroll-{s["slug"]}.svg  {n / 1024:.0f} KB')
     if 'fonts' in want:
-        # the daily bath runs in an Action without the masters, so it gets small subsets
+        # the daily drawings run in an Action without the masters, so they get small subsets
+        import year
         latin = ''.join(chr(c) for c in range(0x20, 0x7f)) + '·–—’'
-        for name, family, weight, chars in [('bath-mincho-800', 'mincho', 800, latin + '墨流し'),
-                                            ('bath-mincho-500', 'mincho', 500, latin),
-                                            ('bath-sans-600', 'sans', 600, latin)]:
+        for name, family, weight, chars in [('mincho-800', 'mincho', 800, latin + '墨流し' + year.CHARS_800),
+                                            ('mincho-500', 'mincho', 500, latin + year.CHARS_500),
+                                            ('sans-600', 'sans', 600, latin)]:
             out = ink.HERE / 'fonts' / f'{name}.woff2'
             out.write_bytes(fonts.woff2(family, weight, chars))
             print(f'tools/fonts/{name}.woff2  {out.stat().st_size / 1024:.0f} KB')
