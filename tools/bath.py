@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Suminagashi from a contribution calendar: ink/bath.svg.
 
-  GITHUB_TOKEN=... python3 tools/bath.py --login skankhunt44
+  GITHUB_TOKEN=... python3 tools/bath.py --login bacuslee
   python3 tools/bath.py --sample            # made-up month, no network
 
 The last four weeks fall into a bath of still water, one day on every beat at
@@ -278,7 +278,7 @@ def still_water() -> str:
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('--login', default=os.environ.get('GITHUB_LOGIN', 'skankhunt44'))
+    ap.add_argument('--login', default=os.environ.get('GITHUB_LOGIN', 'bacuslee'))
     ap.add_argument('--sample', action='store_true', help='draw a made-up month instead of fetching')
     ap.add_argument('--data', type=pathlib.Path, help='a JSON list of [date, count] pairs')
     ap.add_argument('--still', action='store_true', help='draw the empty bath, before any data')

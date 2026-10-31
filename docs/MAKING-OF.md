@@ -75,7 +75,7 @@ Every point is moved by the closed-form drop and tine transforms from Lu, Jaffer
 pip install fonttools brotli pillow numpy
 python3 tools/build.py --fonts path/to/fonts     # day, scrolls, bath fonts
 python3 tools/bath.py --sample                   # try the bath without a token
-GITHUB_TOKEN=... python3 tools/bath.py --login skankhunt44
+GITHUB_TOKEN=... python3 tools/bath.py --login bacuslee
 ```
 
 `--fonts` points at the Google Fonts masters: `ShipporiMinchoB1-Medium.ttf`,

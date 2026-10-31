@@ -18,7 +18,7 @@
 
 - **[SchemaSnap](https://www.schemasnap.app/)** <sub>SAAS · AI · IN DEVELOPMENT</sub><br>Maps diverse data sources onto report templates with AI, so complex reports write themselves.
 - **[Cookie Shield](https://chromewebstore.google.com/detail/aaflponmjepfbnninhobpkfemghjeclp)** <sub>BROWSER EXTENSION · PRIVACY</sub><br>Finds GDPR and CCPA cookie banners and rejects them for you.
-- **[Chess Notation Tracker](https://github.com/skankhunt44/Chess-Notation)** <sub>COMPUTER VISION · PYTHON · PYTORCH · OPENCV</sub><br>Reads an over-the-board game from a phone camera, square by square, and reviews it with Stockfish.
+- **[Chess Notation Tracker](https://github.com/bacuslee/Chess-Notation)** <sub>COMPUTER VISION · PYTHON · PYTORCH · OPENCV</sub><br>Reads an over-the-board game from a phone camera, square by square, and reviews it with Stockfish.
 
 <sub>Write to me: <a href="mailto:bacuslee@gmail.com">bacuslee@gmail.com</a> · <a href="https://bacuslee.com">bacuslee.com</a> · <a href="https://sg.linkedin.com/in/bacus-lee-a35245146">LinkedIn</a> · Singapore, GMT+8</sub>
 
